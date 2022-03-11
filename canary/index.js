@@ -27,6 +27,7 @@ async function run() {
       const isGlobal = core.getInput('is-global', {required: false});
       const registry = core.getInput('registry', {required: false});
       const botName = core.getInput('bot-name', {required: false});
+      const directory = core.getInput('directory', {required: false});
       const context = github.context;
       const {owner, repo, number} = context.issue;
       const pull_number = number;
@@ -40,7 +41,7 @@ async function run() {
       };
       const commit = context.payload.pull_request.head.sha;
       const shortCommit = commit.split('', 7).join('');
-      await exec.exec(`npm --no-git-tag-version version prerelease --preid=${shortCommit}-pr${number}`, [], options);
+      await exec.exec(`npm ${directory ? `--prefix ${directory}` : ''} --no-git-tag-version version prerelease --preid=${shortCommit}-pr${number}`, [], options);
       const npmVersion = myOutput.trim();
       const markdown = await client.markdown.render({
         text: buildBody(message, pkgName, npmVersion, isGlobal, registry)
